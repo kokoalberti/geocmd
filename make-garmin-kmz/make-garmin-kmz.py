@@ -6,6 +6,9 @@ produce a Garmin-compatible KMZ file.
 
 Usage: garmin-kmz.py --grid <GRID_FILE> --raster <RASTER_FILE>
 
+TODO:
+    - add arguments for JPEG quality and resampling method
+    - add progess bar with click
 
 """
 import os
@@ -28,7 +31,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     # Remove existing 'custom-map.kmz' if it exists
-    kmz_file = "custom-map.kmz"
+    kmz_file = "custom_map.kmz"
     if os.path.isfile(kmz_file):
         os.remove(kmz_file)
 
@@ -84,20 +87,22 @@ if __name__ == '__main__':
 
         # Execute the warp into an in-memory VRT using gdal.Warp()
         warp = gdal.Warp('', args.raster, dstSRS='EPSG:4326', format='VRT', 
-                         outputBounds=outputBounds, resampleAlg=resampleAlg)
+                         outputBounds=outputBounds, resampleAlg=resampleAlg,
+                         width=1024, height=1024)
 
         # Write the JPEG tile into the zip/kmz file using gdal.Translate() and 
         # /vsizip/ virtual file system
-        zip_filename = '/vsizip/{}/tiles/tile-{}.jpg'.format(kmz_file, i)
-        gdal.Translate(zip_filename, warp, format='JPEG')
+        zip_filename = '/vsizip/{}/tiles/tile{:03d}.jpg'.format(kmz_file, i)
+        co = ['QUALITY=65']
+        gdal.Translate(zip_filename, warp, format='JPEG', creationOptions=co)
 
         # Create the XML for the overlay part in the KML file
         overlays += """
             <GroundOverlay>
-                <name>Tile {}</name>
-                <drawOrder>30</drawOrder>
+                <name>tile{:03d}</name>
+                <drawOrder>1</drawOrder>
                 <Icon>
-                  <href>tiles/tile-{}.jpg</href>
+                  <href>tiles/tile{:03d}.jpg</href>
                 </Icon>
                 <LatLonBox>
                   <north>{}</north>
@@ -112,8 +117,7 @@ if __name__ == '__main__':
     kml = """<?xml version="1.0" encoding="UTF-8"?>
 <kml xmlns="http://www.opengis.net/kml/2.2">
   <Document>
-    <name>custom-map</name>
-    {}
+    <name>custom_map</name>{}
   </Document>
 </kml>
     """.format(overlays)
