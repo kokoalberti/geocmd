@@ -70,7 +70,7 @@ if __name__ == '__main__':
     # Beware: data.shape is still rotated/mirrored! This is only corrected 
     # on the fly when writing the band.So still flipping the rows/cols in the 
     # drv.Create(...) dataset creation.
-    (root, ext) = os.path.splitext(args.file)
+    (root, ext) = os.path.splitext(os.path.split(args.file)[-1])
     target = os.path.join(args.dir, root+'.tif')
     print(f"Converting {args.file} -> {target}...")
     ds = drv.Create(target, data.shape[1], data.shape[2], data.shape[0], 
