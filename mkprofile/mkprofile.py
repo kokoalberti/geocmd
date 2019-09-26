@@ -1,8 +1,11 @@
+#!/usr/bin/python3
 """
 Simple utility program to extract profiles from GDAL data sources using a 
 two-point equidistanct projection.
 
-TODO: - Add option to include coordinates in output csv file. Currently it just
+TODO: 
+
+- Add option to include coordinates in output csv file. Currently it just
         records along-profile distance.
 """
 import argparse
@@ -15,10 +18,10 @@ if __name__ == '__main__':
     # Parse command line args
     parser = argparse.ArgumentParser(description="Make profile with GDAL")
     parser.add_argument('src', metavar='SRC', help='GDAL data source')
-    parser.add_argument('--lon_1', type=float, required=True, help='Longitude of start point')
-    parser.add_argument('--lat_1', type=float, required=True, help='Latitude of start point')
-    parser.add_argument('--lon_2', type=float, required=True, help='Longitude of end point')
-    parser.add_argument('--lat_2', type=float, required=True, help='Latitude of end point')
+    parser.add_argument('lon_1', metavar='LON_1', type=float, help='Longitude of start point')
+    parser.add_argument('lat_1', metavar='LAT_1', type=float, help='Latitude of start point')
+    parser.add_argument('lon_2', metavar='LON_2', type=float, help='Longitude of end point')
+    parser.add_argument('lat_2', metavar='LAT_2', type=float, help='Latitude of end point')
     parser.add_argument('--width', type=int, default=100, help='Profile width (m)')
     parser.add_argument('--dist', type=int, default=100, help='Profile sampling distance (m)')
     parser.add_argument('--resample', default='near', help='Resampling method')
@@ -52,7 +55,8 @@ if __name__ == '__main__':
     # interpret it as an in-memory dataset.
     format = 'GTiff' if args.tif else 'VRT'
     profile = gdal.Warp(args.tif, ds, dstSRS=proj_str, outputBounds=bbox, 
-                        height=1, width=num_samples, resampleAlg=args.resample, format=format)
+                        height=1, width=num_samples, resampleAlg=args.resample, 
+                        format=format)
 
     # Extract the pixel values and write to an output file
     data = profile.GetRasterBand(1).ReadAsArray()
