@@ -36,7 +36,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     # Set up coordinate transform
-    proj_str = "+proj=tpeqd +lon_1={} +lat_1={} +lon_2={} +lat_2={}".format(args.lon_1, args.lat_1, args.lon_2, args.lon_2)
+    proj_str = "+proj=tpeqd +lon_1={} +lat_1={} +lon_2={} +lat_2={}".format(args.lon_1, args.lat_1, args.lon_2, args.lat_2)
     tpeqd = CRS.from_proj4(proj_str)
     transformer = Transformer.from_crs(CRS.from_proj4("+proj=latlon"), tpeqd)
 
